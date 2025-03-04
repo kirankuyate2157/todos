@@ -6,16 +6,16 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
-      const user = await User.findById(userId);
-      const refreshToken = user.generateRefreshToken();
-      const accessToken = user.generateAccessToken();
-      user.refreshToken = refreshToken;
-      await user.save({ validateBeforeSave: false }); //i validating it  no need to again validation so .
-      return { accessToken, refreshToken };
+        const user = await User.findById(userId);
+        const refreshToken = user.generateRefreshToken();
+        const accessToken = user.generateAccessToken();
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false }); //i validating it  no need to again validation so .
+        return { accessToken, refreshToken };
     } catch (error) { }
-  };
+};
 
-  
+
 const registration = asyncHandler(async (req, res) => {
     /*
       - get user details from frontend
@@ -120,6 +120,57 @@ const loginUser = asyncHandler(async (req, res) => {
         );
 });
 
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res
+        .status(200)
+        .json(new ApiResponse(200, req.user, "user fetched successfully ✅"));
+});
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+    const { email, fullName } = req.body;
+
+    if (!fullName || !email) {
+        throw new ApiError(400, "All field are required 🫠");
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: { fullName: fullName, email: email },
+        },
+        { new: true }
+    ).select("-password");
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, user, "Account details updated successfully ✅")
+        );
+});
+
+const updateUserAvatar = asyncHandler(async (req, res) => {
+    const avatarLocalPath = req.file?.path;
+    if (!avatarLocalPath) {
+        throw new ApiError("400", "Avatar file is missing 🫠");
+    }
+
+    //delete old image is pending
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    if (!avatar.url) {
+        throw new ApiError("404", "Error while uploading on avatar 🫠 ");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: { avatar: avatar.url },
+        },
+        { new: true }
+    ).select("-password");
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Avatar image updated successfully ✅"));
+});
 export {
-    registration, loginUser
+    registration, loginUser, getCurrentUser, updateAccountDetails, updateUserAvatar
 }
