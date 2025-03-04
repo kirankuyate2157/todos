@@ -81,12 +81,46 @@ const createTodo = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, newTodo, "Todo created successfully ✅"));
 });
 
+
 const updateTodo = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const updatedTodo = await Todo.findByIdAndUpdate(id, req.body, { new: true });
-    if (!updatedTodo) {
+    const userId = req.user._id;
+    const { title, description, priority, isCompleted, tags, mentionedUsers, notes } = req.body;
+
+    if (!mongoose.isValidObjectId(id)) {
+        throw new ApiError(400, "Invalid Todo ID provided ");
+    }
+
+    const todo = await Todo.findById(id);
+    if (!todo) {
         throw new ApiError(404, "Todo not found 🫠");
     }
+
+    if (todo.user.toString() !== userId.toString()) {
+        throw new ApiError(403, "You are not authorized to update this todo 🫠");
+    }
+
+    const allowedUpdates = {};
+    if (title) allowedUpdates.title = title;
+    if (description) allowedUpdates.description = description;
+    if (priority) allowedUpdates.priority = priority;
+    if (typeof isCompleted === "boolean") allowedUpdates.isCompleted = isCompleted;
+    if (tags) {
+        const tagIds = tags.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
+        allowedUpdates.tags = tagIds;
+    }
+    if (mentionedUsers) {
+        const userIds = mentionedUsers.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
+        allowedUpdates.mentionedUsers = userIds;
+    }
+    if (notes) {
+        const noteIds = notes.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
+        allowedUpdates.notes = noteIds;
+    }
+
+    // Update Todo
+    const updatedTodo = await Todo.findByIdAndUpdate(id, allowedUpdates, { new: true }).populate("tags notes mentionedUsers");
+
     return res.status(200).json(new ApiResponse(200, updatedTodo, "Todo updated successfully ✅"));
 });
 
