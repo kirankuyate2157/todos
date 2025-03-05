@@ -8,17 +8,19 @@ import { Toaster } from "react-hot-toast";
 function App() {
   axios.defaults.baseURL = "http://localhost:8080/api/v1";
   axios.defaults.params = {};
+  axios.defaults.withCredentials = true;
+  axios.defaults.headers.post["Content-Type"] = "application/json";
+
   return (
     <div className='App  flex justify-center w-full bg-amber-50'>
-      <Toaster position="top-right" />
+      <Toaster position='top-right' />
       <div className='max-w-screen-2xl shadow-md rounded w-full'>
-
-      <Routes>
-        <Route path='/auth' element={<Auth />} />
-        <Route path='/' element={<HomeLayout />}>
-          <Route path='/' element={<>hhhh</>} />
-        </Route>
-      </Routes>
+        <Routes>
+          <Route path='/auth' element={<Auth />} />
+          <Route path='/' element={<HomeLayout />}>
+            <Route path='/' element={<>hhhh</>} />
+          </Route>
+        </Routes>
       </div>
     </div>
   );

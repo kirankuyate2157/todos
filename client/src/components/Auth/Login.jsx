@@ -27,6 +27,7 @@ function Login({ setType }) {
       const res = await loginUser(data);
 
       if (res) {
+        toast.success("Login successfully");
         nav("/");
       }
     } catch (error) {

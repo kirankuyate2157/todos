@@ -17,19 +17,45 @@ import { IoMdDoneAll } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { PiTagFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import { currentUser, logOutUser } from "./Auth/utils/authApi";
+import { Button } from "./ui/button";
+import toast from "react-hot-toast";
 
 const MainNavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("important");
+  const [isUserOpen, setIsUserOpen] = useState(false);
   const menuRef = useRef(null);
+  const userDRef = useRef(null);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setMenuOpen(false);
     }
   };
+  const handleClickOutsideOfUser = (event) => {
+    if (userDRef.current && !userDRef.current.contains(event.target)) {
+      setMenuOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const res = await currentUser();
+        if (res) {
+          console.log(res);
+          setUser(res);
+        }
+      } catch (error) {
+        toast.error(error?.message || error);
+      }
+    }
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     if (menuOpen) {
@@ -39,6 +65,16 @@ const MainNavBar = () => {
     }
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.addEventListener("mousedown", handleClickOutsideOfUser);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutsideOfUser);
+    }
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutsideOfUser);
+  }, [isUserOpen]);
 
   const handleCommandClick = (tab, path) => {
     // console.log("nav..>> ", tab, path);
@@ -66,14 +102,38 @@ const MainNavBar = () => {
             >
               <Menu className='w-6 h-6' />
             </button>
-            <div className='flex items-center cursor-pointer ml-2'>
+            <div
+              className='flex items-center cursor-pointer ml-2'
+              onClick={() => setIsUserOpen(!isUserOpen)}
+            >
               <FaUser className='text-lg mx-2' />
-              <p>Kiran</p>
+              <p>{user?.username||"NA"}</p>
             </div>
           </div>
         </div>
       </nav>
-
+      {isUserOpen && (
+        <div className='absolute z-100 top-16 right-4  w-40 bg-white border rounded-lg shadow-md'>
+          <Command className='rounded-lg'>
+            <CommandList>
+              <CommandItem>
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    logOutUser();
+                    toast.success("logout successfully");
+                    navigate("/auth");
+                    setIsUserOpen(false);
+                  }}
+                  className='block w-full px-4 py-2 text-left text-sm '
+                >
+                  Logout
+                </Button>{" "}
+              </CommandItem>
+            </CommandList>
+          </Command>
+        </div>
+      )}
       {menuOpen && (
         <div
           ref={menuRef}

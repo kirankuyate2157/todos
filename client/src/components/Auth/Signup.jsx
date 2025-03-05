@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { registerMember } from "./utils/authApi";
 
 const Signup = ({ setType }) => {
   const [data, setData] = useState({
@@ -31,7 +32,7 @@ const Signup = ({ setType }) => {
       newErrors.confirmPassword = "Passwords do not match";
     return newErrors;
   };
-
+  username, email, password, fullName;
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
@@ -44,14 +45,20 @@ const Signup = ({ setType }) => {
     }
 
     try {
-      console.log("user : ", data);
-      const res = await axios.post("/users/register", data);
+      const randomAlphanumeric = Math.random().toString(36).slice(-2);
+      const payload = {
+        username: `${data.firstName}${data.lastName}${randomAlphanumeric}`, // Unique username with 2 random alphanumeric characters
+        email: data.email,
+        password: data.password,
+        fullName: `${data.firstName} ${data.lastName}`,
+      };
+      const res = await registerMember(payload);
       if (res) {
-        
+        toast.success("Registered successfully");
         nav("/");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error);
     }
   };
 
@@ -68,10 +75,10 @@ const Signup = ({ setType }) => {
       <form className='w-full h-full flex flex-col justify-center gap-6'>
         <div className='text-slate-600 flex flex-col items-start justify-start'>
           <h1 className=' font-semibold text-[1.7rem] sm:text-3xl'>
-          Stay Productive with Our To-Do App
+            Stay Productive with Our To-Do App
           </h1>
           <p className='font-semibold text-sm'>
-          Keep track of your tasks and notes effortlessly.
+            Keep track of your tasks and notes effortlessly.
           </p>
         </div>
         <div>

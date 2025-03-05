@@ -105,7 +105,7 @@ const loginUser = asyncHandler(async (req, res) => {
         "-password -refreshToken "
     );
 
-    const options = { httpOnly: true, secure: true }; //only modifiable  by server
+    const options = { httpOnly: true, secure: true, sameSite: "Lax", maxAge: 7 * 24 * 60 * 60 * 1000, }; //only modifiable  by server
 
     return res
         .status(200)
@@ -118,6 +118,33 @@ const loginUser = asyncHandler(async (req, res) => {
                 "user logged in successfully ✅"
             )
         );
+});
+
+const logoutUser = asyncHandler(async (req, res) => {
+    /*
+    use cookies to find user 
+    find user by id
+    clear cookies and refreshToken of user
+    */
+    console.log("User: ", req.user)
+    User.findByIdAndUpdate(
+        req.user._id,
+        {
+            // $set: { refreshToken: undefined },
+            $unset: {
+                refreshToken: 1 //this will removes refreshToken from document 
+            }
+        },
+        { new: true }
+    );
+
+    const options = { httpOnly: true, secure: true }; //only modifiable  by server
+
+    return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, {}, "user logout in successfully ✅"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -172,5 +199,5 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, user, "Avatar image updated successfully ✅"));
 });
 export {
-    registration, loginUser, getCurrentUser, updateAccountDetails, updateUserAvatar
+    registration, loginUser, logoutUser, getCurrentUser, updateAccountDetails, updateUserAvatar
 }

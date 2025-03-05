@@ -1,12 +1,12 @@
 import express from "express";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
+import cookieParser from "cookie-parser"
 const app = express();
 
 
 app.use(express.json({ limit: "16kb" })); //json upload limit to save server from crash..
 app.use(express.urlencoded({ extended: true, limit: "16kb" })); //url data understanding
-
+app.use(cookieParser()); // for cookies set & clear & get 
 //routes
 //routes import
 import userRouter from "./routes/user.routes.js";
