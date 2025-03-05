@@ -1,4 +1,5 @@
 import express from "express";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
@@ -14,6 +15,7 @@ import tagRouter from "./routes/tag.routes.js";
 import noteRouter from "./routes/note.routes.js";
 import healthCheckRouter from "./routes/healthcheck.routes.js";
 
+
 //routes declaration
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/users", userRouter);
@@ -24,4 +26,5 @@ app.get("/", (req, res) => {
   res.send("hey Server started now testing .... 🍻⏳");
 });
 
+app.use(errorHandler)
 export { app };
