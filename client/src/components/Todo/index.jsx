@@ -100,11 +100,11 @@ const Todo = ({ priority = [], isCompleted = null }) => {
           <TaskCreationDialog />
         </div>
 
-        <ScrollArea className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[80vh] overflow-auto'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-h-[80vh] overflow-auto'>
           {todos.map((todo) => (
             <Card
               key={todo._id}
-              className='p-4 shadow-lg mt-1 flex flex-col justify-between'
+              className='p-4 shadow-lg  flex flex-col justify-between'
             >
               <CardHeader
                 className='font-semibold text-lg'
@@ -149,7 +149,7 @@ const Todo = ({ priority = [], isCompleted = null }) => {
               </CardFooter>
             </Card>
           ))}
-        </ScrollArea>
+        </div>
 
         {status === "loading" && (
           <Loader className='animate-spin mx-auto my-4' />
