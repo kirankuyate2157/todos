@@ -21,6 +21,8 @@ import debounce from "lodash.debounce";
 import { createTag, getAllTags } from "./apis/tagAPI";
 import { createTodo, getTodoById } from "./apis/todoAPI";
 import { fetchUsers } from "../Auth/utils/authApi";
+import { fetchTodos } from "@/Store/todos/todosSlice";
+import { useDispatch } from "react-redux";
 
 const TaskCreationDialog = ({
   refreshTasks,
@@ -28,6 +30,7 @@ const TaskCreationDialog = ({
   onClose,
   task_id = null,
 }) => {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(initialOpen);
   const [formData, setFormData] = useState({
     title: "",
@@ -189,6 +192,7 @@ const TaskCreationDialog = ({
           notes: "",
           mentionedUsers: [],
         });
+        dispatch(fetchTodos());
       }
     } catch (error) {
       toast.error(error || "Failed to create task ");
