@@ -105,7 +105,7 @@ const loginUser = asyncHandler(async (req, res) => {
         "-password -refreshToken "
     );
 
-    const options = { httpOnly: true, secure: true, sameSite: "Lax", maxAge: 7 * 24 * 60 * 60 * 1000, }; //only modifiable  by server
+    const options = { httpOnly: true, secure: true, maxAge: 7 * 24 * 60 * 60 * 1000, }; //only modifiable  by server
 
     return res
         .status(200)
