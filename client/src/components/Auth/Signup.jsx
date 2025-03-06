@@ -32,7 +32,6 @@ const Signup = ({ setType }) => {
       newErrors.confirmPassword = "Passwords do not match";
     return newErrors;
   };
-  username, email, password, fullName;
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
