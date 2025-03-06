@@ -50,8 +50,9 @@ const getTodos = asyncHandler(async (req, res) => {
         .sort({ [sortBy]: order === "desc" ? -1 : 1 })
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum);
+    const totalTodos = await Todo.countDocuments(filter);
 
-    return res.status(200).json(new ApiResponse(200, todos, "Todos fetched successfully ✅"));
+    return res.status(200).json(new ApiResponse(200, { page, todos, total_pages: Math.ceil(totalTodos / limit) }, "Todos fetched successfully ✅"));
 });
 
 

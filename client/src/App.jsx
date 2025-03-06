@@ -6,12 +6,32 @@ import HomeLayout from "./layouts/HomeLayout";
 import { Toaster } from "react-hot-toast";
 import { ROUTES as CUSTOM_ROUTES } from "./constants/ROUTES.js";
 import Todo from "./components/Todo";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "./Store/user/userSlice";
+import { currentUser } from "./components/Auth/utils/authApi";
 
 function App() {
   axios.defaults.baseURL = "http://localhost:8080/api/v1";
   axios.defaults.params = {};
   axios.defaults.withCredentials = true;
   axios.defaults.headers.post["Content-Type"] = "application/json";
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const fetchLoginUser = async () => {
+      try {
+        const res = await currentUser();
+        if (res) {
+          console.log("cur usr :", res);
+          dispatch(login(res));
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchLoginUser();
+  }, []);
 
   return (
     <div className='App  flex justify-center w-full bg-amber-50'>

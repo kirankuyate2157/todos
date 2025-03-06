@@ -217,7 +217,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
     const totalUsers = await User.countDocuments(query);
 
-    return res.status(200).json(new ApiResponse(200, { page, users, total_pages: totalUsers / limit }, "Users fetched successfully ✅"));
+    return res.status(200).json(new ApiResponse(200, { page, users, total_pages: Math.cell(totalUsers / limit) }, "Users fetched successfully ✅"));
 });
 
 const getUserById = asyncHandler(async (req, res) => {

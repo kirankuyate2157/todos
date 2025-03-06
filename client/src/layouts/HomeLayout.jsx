@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, useLocation, useNavigation } from "react-router";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -6,8 +6,19 @@ import {
 } from "./../components/ui/resizable";
 import MainNavBar from "./../components/MainNavBar";
 import Sidebar from "@/components/Sidebar";
+import { useNavigate } from "react-router-dom";
+import TaskCreationDialog from "./../components/Todo/TaskCreationDialog";
 
 const HomeLayout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const isCreateTaskOpen = searchParams.get("createTask") === "true";
+
+  const handleCloseModal = () => {
+    searchParams.delete("createTask"); // Remove the query param
+    navigate({ search: searchParams.toString() }, { replace: true });
+  };
   return (
     <div className='flex flex-col h-screen'>
       <MainNavBar />
@@ -29,6 +40,11 @@ const HomeLayout = () => {
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+      <TaskCreationDialog
+        refreshTasks={() => {}}
+        initialOpen={isCreateTaskOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

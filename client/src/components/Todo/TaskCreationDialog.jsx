@@ -19,9 +19,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import debounce from "lodash.debounce";
 import { createTag, getAllTags } from "./apis/tagAPI";
+import { createTodo, getTodoById } from "./apis/todoAPI";
+import { fetchUsers } from "../Auth/utils/authApi";
 
-const TaskCreationDialog = ({ refreshTasks }) => {
-  const [open, setOpen] = useState(false);
+const TaskCreationDialog = ({
+  refreshTasks,
+  initialOpen = false,
+  onClose,
+  task_id = null,
+}) => {
+  const [open, setOpen] = useState(initialOpen);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -37,15 +44,25 @@ const TaskCreationDialog = ({ refreshTasks }) => {
   const [mentionQuery, setMentionQuery] = useState("");
   const [errors, setErrors] = useState({});
 
+  const fetchTodoById = async () => {
+    try {
+      const res = await getTodoById(task_id);
+      if (res) {
+        setFormData(res?.data?.todo);
+      }
+    } catch (err) {
+      toast.error(err);
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [tagsRes, usersRes] = await Promise.all([
-          axios.get("/tags/"),
-          axios.get("/users/search"),
+          getAllTags(),
+          fetchUsers(),
         ]);
-        setAvailableTags(tagsRes?.data?.data?.tags || []);
-        setAvailableUsers(usersRes?.data?.data?.users || []);
+        setAvailableTags(tagsRes?.data?.tags || []);
+        setAvailableUsers(usersRes?.data?.users || []);
       } catch (error) {
         toast.error("Failed to fetch data");
       }
@@ -81,7 +98,7 @@ const TaskCreationDialog = ({ refreshTasks }) => {
     }
   }, 300);
 
-  const fetchUsers = debounce(async (query) => {
+  const fetchUsersSearch = debounce(async (query) => {
     try {
       const res = await axios.get(`/users/search?search=${query}`);
       setAvailableUsers(res?.data?.data?.users || []);
@@ -130,7 +147,8 @@ const TaskCreationDialog = ({ refreshTasks }) => {
   const handleMentionChange = (e) => {
     const value = e.target.value;
     setMentionQuery(value);
-    if (value.startsWith("@") && value.length > 2) fetchUsers(value.slice(1));
+    if (value.startsWith("@") && value.length > 2)
+      fetchUsersSearch(value.slice(1));
   };
 
   const addMention = (user) => {
@@ -156,33 +174,46 @@ const TaskCreationDialog = ({ refreshTasks }) => {
       return;
 
     try {
-      await axios.post("/todo", {
+      const res = await createTodo({
         ...formData,
         mentionedUsers: formData.mentionedUsers.map((u) => u.id),
       });
-      toast.success("Task created successfully");
-      setOpen(false);
-      refreshTasks();
-      setFormData({
-        title: "",
-        description: "",
-        tags: [],
-        notes: "",
-        mentionedUsers: [],
-      });
+      if (res) {
+        toast.success("Task created successfully");
+        setOpen(false);
+        refreshTasks();
+        setFormData({
+          title: "",
+          description: "",
+          tags: [],
+          notes: "",
+          mentionedUsers: [],
+        });
+      }
     } catch (error) {
-      toast.error("Failed to create task ");
+      toast.error(error || "Failed to create task ");
     }
   };
+  const handleClose = () => {
+    setOpen(false);
+    if (onClose) onClose();
+  };
+
+  useEffect(() => {
+    setOpen(initialOpen);
+    if (task_id) {
+      fetchTodoById();
+    }
+  }, [initialOpen]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>Create Task</Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
+      {/* <DialogTrigger asChild>
+        <Button>{task_id ? "Edit" : "Create"} Task</Button>
+      </DialogTrigger> */}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create a New Task</DialogTitle>
+          <DialogTitle>{task_id ? "Edit" : "Create a New"} Task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
           <Input
@@ -228,31 +259,33 @@ const TaskCreationDialog = ({ refreshTasks }) => {
               </div>
             </PopoverTrigger>
             <PopoverContent>
-              <div className='flex gap-1'>
-                <Input
-                  placeholder='Add Tags'
-                  value={tagQuery}
-                  onChange={handleTagChange}
-                />
-                <Button
-                  variant='outline'
-                  onClick={newTags}
-                  disabled={availableTags?.length > 0}
-                >
-                  Add
-                </Button>
-              </div>
-              <span className='max-h-[150px] overflow-auto'>
-                {availableTags.map((tag) => (
-                  <div
-                    key={tag}
-                    onClick={() => addTag(tag)}
-                    className='cursor-pointer hover:bg-gray-100 p-2'
+              <>
+                <div className='flex gap-1'>
+                  <Input
+                    placeholder='Add Tags'
+                    value={tagQuery}
+                    onChange={handleTagChange}
+                  />
+                  <Button
+                    variant='outline'
+                    onClick={newTags}
+                    disabled={availableTags?.length > 0}
                   >
-                    {tag?.name}
-                  </div>
-                ))}
-              </span>
+                    Add
+                  </Button>
+                </div>
+                <div className='max-h-[200px] overflow-auto'>
+                  {availableTags.map((tag) => (
+                    <div
+                      key={tag}
+                      onClick={() => addTag(tag)}
+                      className='cursor-pointer hover:bg-gray-100 p-2'
+                    >
+                      {tag?.name}
+                    </div>
+                  ))}
+                </div>
+              </>
             </PopoverContent>
           </Popover>
           <Popover id='popover-mention'>
@@ -276,28 +309,30 @@ const TaskCreationDialog = ({ refreshTasks }) => {
               </div>
             </PopoverTrigger>
             <PopoverContent>
-              <div className='flex gap-1'>
-                <Input
-                  placeholder='Mention Users (@username)'
-                  value={mentionQuery}
-                  onChange={handleMentionChange}
-                />
-              </div>
-              {mentionQuery.length > 3 && mentionQuery.startsWith("@") && (
-                <span className='max-h-[150px] overflow-auto'>
-                  {availableUsers?.map((user) => (
-                    <div
-                      key={user?._id}
-                      onClick={() => addMention(user)}
-                      className='cursor-pointer hover:bg-gray-100 p-2'
-                    >
-                      {`${user?.username || "unknown"} (${
-                        user?.fullName || ""
-                      })` || "NA"}
-                    </div>
-                  ))}
-                </span>
-              )}
+              <>
+                <div className='flex gap-1'>
+                  <Input
+                    placeholder='Mention Users (@username)'
+                    value={mentionQuery}
+                    onChange={handleMentionChange}
+                  />
+                </div>
+                {mentionQuery.length > 3 && mentionQuery.startsWith("@") && (
+                  <div className='max-h-[200px] overflow-auto'>
+                    {availableUsers?.map((user) => (
+                      <div
+                        key={user?._id}
+                        onClick={() => addMention(user)}
+                        className='cursor-pointer hover:bg-gray-100 p-2'
+                      >
+                        {`${user?.username || "unknown"} (${
+                          user?.fullName || ""
+                        })` || "NA"}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             </PopoverContent>
           </Popover>
 

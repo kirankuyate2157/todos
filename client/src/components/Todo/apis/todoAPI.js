@@ -9,7 +9,32 @@ export const createTodo = async (todoData) => {
     }
 };
 
-export const getTodos = async () => {
+export const getTodos = async ({
+    page = 1,
+    limit = 10,
+    order = "desc",
+    tags,
+    mentionedUsers,
+    all = false,
+} = {}) => {
+    try {
+        const params = {
+            page,
+            limit,
+            order,
+            ...(tags ? { tags: tags.join(",") } : {}),
+            ...(mentionedUsers ? { mentionedUsers: mentionedUsers.join(",") } : {}),
+            ...(all !== undefined ? { all } : {}),
+        };
+
+        const response = await axios.get("/todo", { params });
+        return response.data;
+    } catch (error) {
+        throw error?.response?.data?.message || "Error fetching todos";
+    }
+};
+
+export const getTodos2 = async () => {
     try {
         const response = await axios.get('/todo');
         return response.data;
