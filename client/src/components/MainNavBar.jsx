@@ -110,7 +110,7 @@ const MainNavBar = () => {
           ?.map((user) => user?.fullName || user?.username)
           .join(", "),
         Tags: todo?.tags?.map((tag) => tag?.name).join(", "),
-        Created_Time: new Date(todo?.createdAt).toLocaleString()
+        Created_Time: new Date(todo?.createdAt).toLocaleString(),
       }));
 
       setTodoData(formattedData);
@@ -130,7 +130,10 @@ const MainNavBar = () => {
     <>
       <nav className='bg-muted-foreground/20  border-gray-200 dark:bg-gray-900'>
         <div className=' flex  flex-wrap items-center justify-between p-4'>
-          <span className='self-center text-2xl font-semibold whitespace-nowrap dark:text-white'>
+          <span
+            className='self-center text-2xl font-semibold whitespace-nowrap dark:text-white'
+            onClick={() => navigate("/")}
+          >
             Todo
           </span>
 
@@ -140,12 +143,11 @@ const MainNavBar = () => {
 
           <div className='flex  items-center justify-end'>
             <Button
-            variant='outline'
+              variant='outline'
               className=' px-3 bg-gray-200 border-2 flex gap-1 items-center '
               onClick={fetchAndDownloadCsv}
             >
-              <HiOutlineDocumentDownload style={{ fontSize: "23px" }} />{" "}
-              CSV
+              <HiOutlineDocumentDownload style={{ fontSize: "23px" }} /> CSV
             </Button>
             <CSVLink
               className='d-none'
