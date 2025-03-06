@@ -13,7 +13,7 @@ import { currentUser } from "./components/Auth/utils/authApi";
 import Users from "./components/Users";
 
 function App() {
-  axios.defaults.baseURL = "https://kk-todos.onrender.com/api/v1"; //"http://localhost:8080/api/v1";
+  axios.defaults.baseURL = "http://localhost:8080/api/v1";//"https://kk-todos.onrender.com/api/v1"; //"http://localhost:8080/api/v1";
   axios.defaults.params = {};
   axios.defaults.withCredentials = true;
   axios.defaults.headers.post["Content-Type"] = "application/json";

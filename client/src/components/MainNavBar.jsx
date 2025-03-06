@@ -11,7 +11,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { FaAnglesUp, FaUserGroup } from "react-icons/fa6";
+import { FaAnglesUp, FaPlus, FaUserGroup } from "react-icons/fa6";
 import { MdOutlineFileDownloadDone } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
 import { IoMdDoneAll } from "react-icons/io";
@@ -20,7 +20,7 @@ import {
   HiOutlineDotsHorizontal,
 } from "react-icons/hi";
 import { PiTagFill } from "react-icons/pi";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { currentUser, logOutUser } from "./Auth/utils/authApi";
 import { Button } from "./ui/button";
 import toast from "react-hot-toast";
@@ -37,7 +37,17 @@ const MainNavBar = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-
+  const location = useLocation();
+  const [tabs, setTab] = useState("home");
+  const handleCreateTask = () => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("createTask", "true");
+    navigate({ search: searchParams.toString() });
+    setMenuOpen(false);
+  };
+  useEffect(() => {
+    setTab(`${Math.random()}`);
+  }, [location]);
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
       setMenuOpen(false);
@@ -211,6 +221,12 @@ const MainNavBar = () => {
               <CommandEmpty>No results found.</CommandEmpty>
 
               <CommandGroup heading='Tasks'>
+                <CommandItem className="mb-1" onSelect={handleCreateTask}>
+                  
+                    <FaPlus />
+                    <span>New Task</span>
+               
+                </CommandItem>
                 <CommandItem
                   onSelect={() =>
                     handleCommandClick("important", ROUTES.Important.route)
