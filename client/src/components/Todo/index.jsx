@@ -23,9 +23,11 @@ import { fetchTodos } from "@/Store/todos/todosSlice";
 import NoteModal from "./NoteModal ";
 import NotesDrawer from "./NotesDrawer";
 import { updateTodo } from "./apis/todoAPI";
+import { useLocation } from "react-router-dom";
 
-const Todo = ({priories=[],isCompleted=null,}) => {
+const Todo = ({ priority = [], isCompleted = null }) => {
   const dispatch = useDispatch();
+  const location=useLocation();
   const { todos, page, totalPages, status } = useSelector(
     (state) => state.todos
   );
@@ -37,20 +39,23 @@ const Todo = ({priories=[],isCompleted=null,}) => {
   const [viewTask, setViewTask] = useState(null);
   const [selectedTask, setSelectedTask] = useState(null);
   const params = {
-    page,
+    page: 1,
     search: filters?.search ?? "",
     order: filters.order ?? "desc",
+    priority,
+    isCompleted,
   };
+
   useEffect(() => {
     dispatch(fetchTodos(params));
-  }, [dispatch, page, filters]);
+  }, [dispatch, filters,location]);
 
   // Load More on Scroll
   useEffect(() => {
     if (inView && page < totalPages && status !== "loading") {
       dispatch(fetchTodos({ page: page + 1 }));
     }
-  }, [inView, totalPages, status, dispatch]);
+  }, [inView, totalPages]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -75,13 +80,13 @@ const Todo = ({priories=[],isCompleted=null,}) => {
             placeholder='Search Todos...'
             value={filters.search}
             onChange={(e) => handleFilterChange("search", e.target.value)}
-            className='w-full sm:w-[250px]'
+            className='w-[50%] sm:w-[250px]'
           />
           <Select
             onValueChange={(value) => handleFilterChange("order", value)}
             value={filters.order}
           >
-            <SelectTrigger className='w-[180px]'>
+            <SelectTrigger className='w-[40%] sm:w-[180px]'>
               <SelectValue placeholder='Sort By' />
             </SelectTrigger>
             <SelectContent>

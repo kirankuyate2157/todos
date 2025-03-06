@@ -17,13 +17,16 @@ export const getTodos = async ({
     search = "",
     mentionedUsers,
     all = false,
+    priority = [],
+    isCompleted = null,
 } = {}) => {
     try {
         const params = {
             page,
             limit,
             order,
-            search,
+            search, isCompleted,
+            ...(priority ? { priority: priority.join(",") } : {}),
             ...(tags ? { tags: tags.join(",") } : {}),
             ...(mentionedUsers ? { mentionedUsers: mentionedUsers.join(",") } : {}),
             ...(all !== undefined ? { all } : {}),

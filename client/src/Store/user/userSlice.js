@@ -1,8 +1,8 @@
 import { fetchUsers } from "@/components/Auth/utils/authApi";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const fetchCustomersData = createAsyncThunk(
-  "user/fetchCustomersData",
+export const fetchUsersData = createAsyncThunk(
+  "user/fetchUsersData",
   async ({ page = 1, limit = 30, search = "" }) => {
     const params = { page, limit, search };
     const response = await fetchUsers(params);
@@ -41,11 +41,11 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchCustomersData.pending, (state) => {
+      .addCase(fetchUsersData.pending, (state) => {
         state.users.status = "loading";
         state.users.error = null;
       })
-      .addCase(fetchCustomersData.fulfilled, (state, action) => {
+      .addCase(fetchUsersData.fulfilled, (state, action) => {
         const { page } = action.meta.arg;
 
         const list =
@@ -54,12 +54,12 @@ const userSlice = createSlice({
             : [...(action?.payload?.users || [])];
 
         state.users.status = "succeeded";
-        state.customers = list || [];
+        state.users.users = list || [];
         state.page = action?.payload?.page || 1;
         state.total_pages = action?.payload?.total_pages || 1;
         state.recentParams = action?.payload?.params;
       })
-      .addCase(fetchCustomersData.rejected, (state, action) => {
+      .addCase(fetchUsersData.rejected, (state, action) => {
         state.users.status = "failed";
         state.users.error = action.payload || "Failed to fetch users.";
       });

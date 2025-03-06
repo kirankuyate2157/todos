@@ -12,14 +12,21 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { FaAnglesUp, FaUserGroup } from "react-icons/fa6";
+import { MdOutlineFileDownloadDone } from "react-icons/md";
 import { FiInfo } from "react-icons/fi";
 import { IoMdDoneAll } from "react-icons/io";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
+import {
+  HiOutlineDocumentDownload,
+  HiOutlineDotsHorizontal,
+} from "react-icons/hi";
 import { PiTagFill } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import { currentUser, logOutUser } from "./Auth/utils/authApi";
 import { Button } from "./ui/button";
 import toast from "react-hot-toast";
+import { ROUTES } from "@/constants/ROUTES";
+import { getTodos } from "./Todo/apis/todoAPI";
+import { CSVLink } from "react-csv";
 
 const MainNavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -82,7 +89,43 @@ const MainNavBar = () => {
     navigate(path);
     setMenuOpen(false);
   };
+  const [todoData, setTodoData] = useState([]);
+  const [isPreparingCsv, setIsPreparingCsv] = useState(false);
+  const csvLinkRef = useRef(null);
 
+  const fetchAndDownloadCsv = async () => {
+    if (isPreparingCsv) return;
+    const toastId = toast.loading("Fetching todo data...");
+    setIsPreparingCsv(true);
+
+    try {
+      const todos = await getTodos({ limit: 1000, all: false });
+      const formattedData = todos?.data?.todos?.map((todo) => ({
+        ID: todo?._id,
+        Title: todo?.title,
+        Description: todo?.description,
+        Priority: todo?.priority,
+        Status: todo?.isCompleted ? "Completed" : "Pending",
+        "Mentioned Users": todo?.mentionedUsers
+          ?.map((user) => user?.fullName || user?.username)
+          .join(", "),
+        Tags: todo?.tags?.map((tag) => tag?.name).join(", "),
+        Created_Time: new Date(todo?.createdAt).toLocaleString()
+      }));
+
+      setTodoData(formattedData);
+      toast.success("Todo data ready. Downloading...");
+      setTimeout(() => {
+        csvLinkRef.current.link.click();
+      }, 500);
+    } catch (error) {
+      console.error("Failed to fetch todo data:", error);
+      toast.error("Failed to fetch todo data.");
+    } finally {
+      toast.dismiss(toastId);
+      setIsPreparingCsv(false);
+    }
+  };
   return (
     <>
       <nav className='bg-muted-foreground/20  border-gray-200 dark:bg-gray-900'>
@@ -91,11 +134,25 @@ const MainNavBar = () => {
             Todo
           </span>
 
-          <div className='hidden lg:block w-[40%]'>
+          {/* <div className='hidden lg:block w-[40%]'>
             <Input type='text' className='bg-amber-50' placeholder='Search..' />
-          </div>
+          </div> */}
 
           <div className='flex  items-center justify-end'>
+            <Button
+            variant='outline'
+              className=' px-3 bg-gray-200 border-2 flex gap-1 items-center '
+              onClick={fetchAndDownloadCsv}
+            >
+              <HiOutlineDocumentDownload style={{ fontSize: "23px" }} />{" "}
+              CSV
+            </Button>
+            <CSVLink
+              className='d-none'
+              data={todoData}
+              filename={`todos_${new Date().toISOString().split("T")[0]}.csv`}
+              ref={csvLinkRef}
+            />
             <button
               className='lg:hidden p-2 rounded-md focus:outline-none focus:ring'
               onClick={() => setMenuOpen(!menuOpen)}
@@ -153,21 +210,27 @@ const MainNavBar = () => {
 
               <CommandGroup heading='Tasks'>
                 <CommandItem
-                  onSelect={() => handleCommandClick("important", "/important")}
+                  onSelect={() =>
+                    handleCommandClick("important", ROUTES.Important.route)
+                  }
                   className={activeTab === "important" ? "bg-gray-200" : ""}
                 >
                   <FiInfo />
                   <span>Important</span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleCommandClick("completed", "/completed")}
+                  onSelect={() =>
+                    handleCommandClick("completed", ROUTES.Completed.route)
+                  }
                   className={activeTab === "completed" ? "bg-gray-200" : ""}
                 >
                   <IoMdDoneAll />
                   <span>Completed</span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleCommandClick("due", "/due-soon")}
+                  onSelect={() =>
+                    handleCommandClick("due", ROUTES.DueSoon.route)
+                  }
                   className={activeTab === "due" ? "bg-gray-200" : ""}
                 >
                   <HiOutlineDotsHorizontal />
@@ -179,7 +242,9 @@ const MainNavBar = () => {
 
               <CommandGroup heading='Priority'>
                 <CommandItem
-                  onSelect={() => handleCommandClick("high", "/priority/high")}
+                  onSelect={() =>
+                    handleCommandClick("high", ROUTES.HighPriority.route)
+                  }
                   className={activeTab === "high" ? "bg-gray-200" : ""}
                 >
                   <FaAnglesUp />
@@ -187,7 +252,7 @@ const MainNavBar = () => {
                 </CommandItem>
                 <CommandItem
                   onClick={() =>
-                    handleCommandClick("medium", "/priority/medium")
+                    handleCommandClick("medium", ROUTES.MediumPriority.route)
                   }
                   className={activeTab === "medium" ? "bg-gray-200" : ""}
                 >
@@ -195,7 +260,9 @@ const MainNavBar = () => {
                   <span>Medium</span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleCommandClick("low", "/priority/low")}
+                  onSelect={() =>
+                    handleCommandClick("low", ROUTES.LowPriority.route)
+                  }
                   className={activeTab === "low" ? "bg-gray-200" : ""}
                 >
                   <FaAnglesUp />
@@ -208,7 +275,10 @@ const MainNavBar = () => {
               <CommandGroup heading='More'>
                 <CommandItem
                   onSelect={() =>
-                    handleCommandClick("notification", "/notifications")
+                    handleCommandClick(
+                      "notification",
+                      ROUTES.Notification.route
+                    )
                   }
                   className={activeTab === "notification" ? "bg-gray-200" : ""}
                 >
@@ -216,7 +286,9 @@ const MainNavBar = () => {
                   <span>Notification</span>
                 </CommandItem>
                 <CommandItem
-                  onSelect={() => handleCommandClick("users", "/users")}
+                  onSelect={() =>
+                    handleCommandClick("users", ROUTES.Users.route)
+                  }
                   className={activeTab === "users" ? "bg-gray-200" : ""}
                 >
                   <FaUserGroup />

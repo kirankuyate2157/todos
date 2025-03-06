@@ -56,7 +56,8 @@ const createTag = asyncHandler(async (req, res) => {
 
     const existingTag = await Tag.findOne({ name });
     if (existingTag) {
-        res.status(200).json(new ApiResponse(200, tag = existingTag, "Tag existing tag used successfully ✅"));
+        let tag=existingTag;
+        res.status(200).json(new ApiResponse(200, tag, "Tag existing tag used successfully ✅"));
         // throw new ApiError(409, "Tag already exists 🫠");
     }
 

@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { login } from "./Store/user/userSlice";
 import { currentUser } from "./components/Auth/utils/authApi";
+import Users from "./components/Users";
 
 function App() {
   axios.defaults.baseURL = "http://localhost:8080/api/v1";
@@ -43,30 +44,33 @@ function App() {
             <Route path={CUSTOM_ROUTES.Home.route} element={<Todo />} />
             <Route
               path={CUSTOM_ROUTES.Important.route}
-              element={<>Important</>}
+              element={<Todo priority={["high", "medium"]} />}
             />
             <Route
               path={CUSTOM_ROUTES.Completed.route}
-              element={<>Completed</>}
+              element={<Todo isCompleted={true} />}
             />
-            <Route path={CUSTOM_ROUTES.DueSoon.route} element={<>DueSoon</>} />{" "}
+            <Route
+              path={CUSTOM_ROUTES.DueSoon.route}
+              element={<Todo isCompleted={false} />}
+            />{" "}
             <Route
               path={CUSTOM_ROUTES.HighPriority.route}
-              element={<>HighPriority</>}
+              element={<Todo priority={["high"]} />}
             />
             <Route
               path={CUSTOM_ROUTES.MediumPriority.route}
-              element={<>MediumPriority</>}
+              element={<Todo priority={["medium"]} />}
             />
             <Route
               path={CUSTOM_ROUTES.LowPriority.route}
-              element={<>LowPriority</>}
+              element={<Todo priority={["low"]} />}
             />
             <Route
               path={CUSTOM_ROUTES.Notification.route}
               element={<>Notification</>}
             />
-            <Route path={CUSTOM_ROUTES.Users.route} element={<>Users</>} />
+            <Route path={CUSTOM_ROUTES.Users.route} element={<Users />} />
           </Route>
         </Routes>
       </div>

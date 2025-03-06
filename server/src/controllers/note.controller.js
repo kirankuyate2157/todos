@@ -8,11 +8,10 @@ import mongoose from "mongoose";
  * Get all notes with optional filters: tags, mentionedUsers, todo, all &  user 
  */
 const getNotes = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, tags, mentionedUsers, todo, all = false, user_id="" } = req.query;
+    const { page = 1, limit = 10, tags, mentionedUsers, todo, all = false, user_id = "" } = req.query;
     const userId = req.user._id;
 
     let filter = {};
-
     if (!all) {
         filter.createdBy = user_id || userId
     }
@@ -36,7 +35,12 @@ const getNotes = asyncHandler(async (req, res) => {
     }
 
     const notes = await Note.find(filter)
-        .populate("todo tags mentionedUsers createdBy")
+        .populate("todo tags createdBy")
+        .populate({
+            path: "mentionedUsers",
+            select: "username fullName _id avatar",
+        })
+
         .sort({ createdAt: -1 })
         .skip((Math.max(1, parseInt(page, 10)) - 1) * Math.max(1, parseInt(limit, 10)))
         .limit(Math.max(1, parseInt(limit, 10)));
@@ -49,7 +53,10 @@ const getNotes = asyncHandler(async (req, res) => {
  */
 const getNoteById = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const note = await Note.findById(id).populate("todo tags mentionedUsers createdBy");
+    const note = await Note.findById(id).populate("todo tags  createdBy").populate({
+        path: "mentionedUsers",
+        select: "username fullName _id avatar",
+    })
 
     if (!note) {
         throw new ApiError(404, "Note not found 🫠");
@@ -61,7 +68,6 @@ const getNoteById = asyncHandler(async (req, res) => {
 
 
 // check req validations 
-
 const createNote = asyncHandler(async (req, res) => {
     const { todo, content, tags, mentionedUsers } = req.body;
     if (!content) {

@@ -16,11 +16,13 @@ const getTodos = asyncHandler(async (req, res) => {
         limit = 10,
         sortBy = "createdAt",
         order = "desc",
+        priority = [],
+        isCompleted = null,
         tags,
         mentionedUsers,
         all,
     } = req.query;
-
+    const search = req.query.search ? req.query.search.trim() : "";
     const userId = req.user._id;
     let filter = {};
 
@@ -28,6 +30,16 @@ const getTodos = asyncHandler(async (req, res) => {
         filter.user = userId;
     }
 
+    if (priority?.length) {
+        const priorityArray = Array.isArray(priority) ? priority : priority.split(",");
+        filter.priority = { $in: priorityArray };
+    }
+
+
+    if (isCompleted !== null) {
+        filter.isCompleted = isCompleted === "true";
+    }
+    
     if (tags) {
         const tagIds = tags.split(",").filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
         if (tagIds.length) {
@@ -41,12 +53,22 @@ const getTodos = asyncHandler(async (req, res) => {
             filter.mentionedUsers = { $in: userIds };
         }
     }
+    if (search.trim()) {
+        filter.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+        ];
+    }
 
     const pageNum = isNaN(parseInt(page, 10)) ? 1 : Math.max(1, parseInt(page, 10));
     const limitNum = Math.max(1, parseInt(limit, 10));
 
     const todos = await Todo.find(filter)
-        .populate("tags mentionedUsers notes")
+        .populate("tags notes")
+        .populate({
+            path: "mentionedUsers",
+            select: "username fullName _id avatar",
+        })
         .sort({ [sortBy]: order === "desc" ? -1 : 1 })
         .skip((pageNum - 1) * limitNum)
         .limit(limitNum);
@@ -66,9 +88,14 @@ const getTodoById = asyncHandler(async (req, res) => {
 });
 
 const createTodo = asyncHandler(async (req, res) => {
-    const { title, description, tags, mentionedUsers } = req.body;
+    let { title, description, tags, mentionedUsers } = req.body;
     if (!title) {
         throw new ApiError(400, "Title is required 🫠");
+    }
+
+    if (mentionedUsers) {
+        const userIds = mentionedUsers.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
+        mentionedUsers = userIds;
     }
 
     const newTodo = await Todo.create({
@@ -109,6 +136,7 @@ const updateTodo = asyncHandler(async (req, res) => {
         const tagIds = tags.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
         allowedUpdates.tags = tagIds;
     }
+
     if (mentionedUsers) {
         const userIds = mentionedUsers.filter(id => mongoose.isValidObjectId(id)).map(id => new mongoose.Types.ObjectId(id));
         allowedUpdates.mentionedUsers = userIds;

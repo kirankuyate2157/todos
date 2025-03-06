@@ -7,15 +7,20 @@ import { IoMdDoneAll } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { PiTagFill } from "react-icons/pi";
 import { ROUTES } from "@/constants/ROUTES";
+import { useEffect, useState } from "react";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [tabs, setTab] = useState("home");
   const handleCreateTask = () => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set("createTask", "true");
     navigate({ search: searchParams.toString() });
   };
+  useEffect(() => {
+    setTab(`${Math.random()}`);
+  }, [location]);
   return (
     <div className=''>
       <aside
