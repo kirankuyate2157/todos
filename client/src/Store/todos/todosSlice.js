@@ -4,13 +4,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchTodos = createAsyncThunk(
     "todos/fetchTodos",
-    async ({ page = 1, limit = 10, sortBy = "createdAt", order = "desc", tags, mentionedUsers, all } = {}, { rejectWithValue }) => {
+    async ({ page = 1, search="",limit = 10, sortBy = "createdAt", order = "desc", tags, mentionedUsers, all } = {}, { rejectWithValue }) => {
         try {
             const params = {
                 page,
                 limit,
                 sortBy,
                 order,
+                search,
                 ...(tags ? { tags: tags.join(",") } : {}), // Convert array to comma-separated string
                 ...(mentionedUsers ? { mentionedUsers: mentionedUsers.join(",") } : {}),
                 ...(all !== undefined ? { all } : {}),
@@ -35,6 +36,7 @@ const initialState = {
         tags: [],
         owner: null,
         mentionedUsers: [],
+        search:"",
         all: false,
         limit: 10,
     },

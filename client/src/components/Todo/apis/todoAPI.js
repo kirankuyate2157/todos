@@ -14,6 +14,7 @@ export const getTodos = async ({
     limit = 10,
     order = "desc",
     tags,
+    search = "",
     mentionedUsers,
     all = false,
 } = {}) => {
@@ -22,6 +23,7 @@ export const getTodos = async ({
             page,
             limit,
             order,
+            search,
             ...(tags ? { tags: tags.join(",") } : {}),
             ...(mentionedUsers ? { mentionedUsers: mentionedUsers.join(",") } : {}),
             ...(all !== undefined ? { all } : {}),

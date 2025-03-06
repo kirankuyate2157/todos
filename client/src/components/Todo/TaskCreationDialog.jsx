@@ -64,7 +64,7 @@ const TaskCreationDialog = ({
         setAvailableTags(tagsRes?.data?.tags || []);
         setAvailableUsers(usersRes?.data?.users || []);
       } catch (error) {
-        toast.error("Failed to fetch data");
+        // toast.error("Failed to fetch data");
       }
     };
     fetchData();
@@ -152,7 +152,7 @@ const TaskCreationDialog = ({
   };
 
   const addMention = (user) => {
-    if (!formData.mentionedUsers.some((u) => u.id === user.id)) {
+    if (!formData.mentionedUsers.some((u) => u._id === user._id)) {
       setFormData((prev) => ({
         ...prev,
         mentionedUsers: [...prev.mentionedUsers, user],
@@ -164,7 +164,7 @@ const TaskCreationDialog = ({
   const removeMention = (id) => {
     setFormData((prev) => ({
       ...prev,
-      mentionedUsers: prev.mentionedUsers.filter((u) => u.id !== id),
+      mentionedUsers: prev.mentionedUsers.filter((u) => u._id !== _id),
     }));
   };
 
@@ -176,7 +176,7 @@ const TaskCreationDialog = ({
     try {
       const res = await createTodo({
         ...formData,
-        mentionedUsers: formData.mentionedUsers.map((u) => u.id),
+        mentionedUsers: formData.mentionedUsers.map((u) => u._id),
       });
       if (res) {
         toast.success("Task created successfully");
@@ -293,8 +293,8 @@ const TaskCreationDialog = ({
               <div className='flex flex-wrap gap-2 border-dotted p-1'>
                 {formData?.mentionedUsers?.map((user) => (
                   <Badge
-                    key={user?.id}
-                    onClick={() => removeMention(user.id)}
+                    key={user?._id}
+                    onClick={() => removeMention(user._id)}
                     className='cursor-pointer'
                   >
                     {`${user?.username || "unknown"} (${

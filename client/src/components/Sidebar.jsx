@@ -32,7 +32,7 @@ const Sidebar = () => {
             <li>
               <Link
                 to={ROUTES.Important.route}
-                className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
+                className='flex items-center rounded  px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <FiInfo className='text-xl' />
 
@@ -44,7 +44,7 @@ const Sidebar = () => {
             <li>
               <Link
                 to={ROUTES.Completed.route}
-                className='flex items-start rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
+                className='flex items-start rounded border-t px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <IoMdDoneAll className='text-xl' />
                 <span className='ml-3 overflow-x-hidden  whitespace-nowrap'>
@@ -55,7 +55,7 @@ const Sidebar = () => {
             <li>
               <Link
                 to={ROUTES.DueSoon.route}
-                className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
+                className='flex items-center rounded border-t px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <HiOutlineDotsHorizontal className='text-xl' />
                 <span className='ml-3 overflow-x-hidden  whitespace-nowrap'>
@@ -64,7 +64,7 @@ const Sidebar = () => {
               </Link>
             </li>
             <li>
-              <div className='flex flex-col items-start rounded px-3 text-slate-900 dark:text-white '>
+              <div className='flex flex-col items-start rounded px-3 border-t text-slate-900 dark:text-white '>
                 <div className='flex items-center rounded  py-2 w-full text-slate-900  dark:text-white '>
                   <FaAnglesUp className='text-xl' />
                   <span className='ml-3 overflow-x-hidden  whitespace-nowrap'>
@@ -73,13 +73,13 @@ const Sidebar = () => {
                 </div>
                 <li>
                   <ul className='space-y-1 pl-6'>
-                    <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
+                    <li className='w-full rounded border-t text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
                       <Link to={ROUTES.HighPriority.route}>🔴 High</Link>
                     </li>
-                    <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
+                    <li className='w-full rounded border-t text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
                       <Link to={ROUTES.MediumPriority.route}>🟠 Medium</Link>
                     </li>
-                    <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
+                    <li className='w-full rounded border-t text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
                       <Link to={ROUTES.LowPriority.route}>🟢 Low</Link>
                     </li>
                   </ul>
@@ -90,7 +90,7 @@ const Sidebar = () => {
             <li>
               <Link
                 to={"/notification"}
-                className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
+                className='flex items-center rounded border-t px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <PiTagFill className='text-xl' />
                 <span className='ml-3 overflow-x-hidden  whitespace-nowrap'>
@@ -101,7 +101,7 @@ const Sidebar = () => {
             <li>
               <Link
                 to={"/users"}
-                className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
+                className='flex items-center rounded border-t px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <FaUserGroup className='text-xl' />
                 <span className='ml-3 overflow-x-hidden  whitespace-nowrap'>
