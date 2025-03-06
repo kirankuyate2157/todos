@@ -8,13 +8,22 @@ import { Tag } from "../models/tag.model.js";
 - return tag list
  */
 const getAllTags = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
-    const tags = await Tag.find()
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const query = {};
+
+    if (search.trim()) {
+        query.name = { $regex: search, $options: "i" };
+    }
+
+    const tags = await Tag.find(query)
         .skip((page - 1) * limit)
         .limit(parseInt(limit));
 
-    return res.status(200).json(new ApiResponse(200, tags, "Tags fetched successfully ✅"));
+    const totalTags = await Tag.countDocuments(query);
+
+    return res.status(200).json(new ApiResponse(200, { page, tags, total_pages: totalTags / limit }, "Tags fetched successfully ✅"));
 });
+
 
 /*
 - get tag by specific id

@@ -38,7 +38,7 @@ const MainNavBar = () => {
   };
   const handleClickOutsideOfUser = (event) => {
     if (userDRef.current && !userDRef.current.contains(event.target)) {
-      setMenuOpen(false);
+      setIsUserOpen(false);
     }
   };
 
@@ -67,7 +67,7 @@ const MainNavBar = () => {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (menuOpen) {
+    if (isUserOpen) {
       document.addEventListener("mousedown", handleClickOutsideOfUser);
     } else {
       document.removeEventListener("mousedown", handleClickOutsideOfUser);
@@ -107,13 +107,16 @@ const MainNavBar = () => {
               onClick={() => setIsUserOpen(!isUserOpen)}
             >
               <FaUser className='text-lg mx-2' />
-              <p>{user?.username||"NA"}</p>
+              <p>{user?.username || "NA"}</p>
             </div>
           </div>
         </div>
       </nav>
       {isUserOpen && (
-        <div className='absolute z-100 top-16 right-4  w-40 bg-white border rounded-lg shadow-md'>
+        <div
+          ref={userDRef}
+          className='absolute z-100 top-16 right-4  w-40 bg-white border rounded-lg shadow-md'
+        >
           <Command className='rounded-lg'>
             <CommandList>
               <CommandItem>

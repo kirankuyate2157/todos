@@ -1,5 +1,4 @@
-
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { FaPlus } from "react-icons/fa";
 import { FaAnglesUp, FaUserGroup } from "react-icons/fa6";
@@ -7,8 +6,16 @@ import { FiInfo } from "react-icons/fi";
 import { IoMdDoneAll } from "react-icons/io";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { PiTagFill } from "react-icons/pi";
+import { ROUTES } from "@/constants/ROUTES";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const handleCreateTask = () => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("createTask", "true");
+    navigate({ search: searchParams.toString() });
+  };
   return (
     <div className=''>
       <aside
@@ -17,14 +24,14 @@ const Sidebar = () => {
         aria-label='Sidebar'
       >
         <div className=' h-full flex-col hidden sm:flex overflow-y-auto border-r border-slate-200 bg-background px-3 py-4 dark:border-slate-700 '>
-          <Button>
+          <Button onClick={handleCreateTask}>
             <FaPlus />
             <span>New Task</span>
           </Button>
           <ul className='space-y-2 mt-2 text-sm font-medium'>
             <li>
               <Link
-                to={"/important"}
+                to={ROUTES.Important.route}
                 className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <FiInfo className='text-xl' />
@@ -36,7 +43,7 @@ const Sidebar = () => {
             </li>
             <li>
               <Link
-                to={"/completed"}
+                to={ROUTES.Completed.route}
                 className='flex items-start rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <IoMdDoneAll className='text-xl' />
@@ -47,7 +54,7 @@ const Sidebar = () => {
             </li>
             <li>
               <Link
-                to={"/due"}
+                to={ROUTES.DueSoon.route}
                 className='flex items-center rounded px-3 py-2 text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'
               >
                 <HiOutlineDotsHorizontal className='text-xl' />
@@ -67,19 +74,13 @@ const Sidebar = () => {
                 <li>
                   <ul className='space-y-1 pl-6'>
                     <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
-                      <Link to='/priority/high' className='sidebar-sublink '>
-                        🔴 High
-                      </Link>
+                      <Link to={ROUTES.HighPriority.route}>🔴 High</Link>
                     </li>
                     <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
-                      <Link to='/priority/medium' className='sidebar-sublink'>
-                        🟠 Medium
-                      </Link>
+                      <Link to={ROUTES.MediumPriority.route}>🟠 Medium</Link>
                     </li>
                     <li className='w-full rounded text-slate-900 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-700'>
-                      <Link to='/priority/low' className='sidebar-sublink'>
-                        🟢 Low
-                      </Link>
+                      <Link to={ROUTES.LowPriority.route}>🟢 Low</Link>
                     </li>
                   </ul>
                 </li>
@@ -109,7 +110,6 @@ const Sidebar = () => {
               </Link>
             </li>
           </ul>
-         
         </div>
       </aside>
     </div>
@@ -117,4 +117,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-

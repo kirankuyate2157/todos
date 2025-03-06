@@ -20,7 +20,7 @@ import healthCheckRouter from "./routes/healthcheck.routes.js";
 app.use("/api/v1/healthcheck", healthCheckRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/todo", todoRouter);
-app.use("/api/v1/tag", tagRouter);
+app.use("/api/v1/tags", tagRouter);
 app.use("/api/v1/note", noteRouter);
 app.get("/", (req, res) => {
   res.send("hey Server started now testing .... 🍻⏳");

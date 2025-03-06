@@ -4,6 +4,8 @@ import axios from "axios";
 import Auth from "./components/Auth";
 import HomeLayout from "./layouts/HomeLayout";
 import { Toaster } from "react-hot-toast";
+import { ROUTES as CUSTOM_ROUTES } from "./constants/ROUTES.js";
+import Todo from "./components/Todo";
 
 function App() {
   axios.defaults.baseURL = "http://localhost:8080/api/v1";
@@ -16,9 +18,35 @@ function App() {
       <Toaster position='top-right' />
       <div className='max-w-screen-2xl shadow-md rounded w-full'>
         <Routes>
-          <Route path='/auth' element={<Auth />} />
-          <Route path='/' element={<HomeLayout />}>
-            <Route path='/' element={<>hhhh</>} />
+          <Route path={CUSTOM_ROUTES.Auth.route} element={<Auth />} />
+          <Route path={CUSTOM_ROUTES.Home.route} element={<HomeLayout />}>
+            <Route path={CUSTOM_ROUTES.Home.route} element={<Todo />} />
+            <Route
+              path={CUSTOM_ROUTES.Important.route}
+              element={<>Important</>}
+            />
+            <Route
+              path={CUSTOM_ROUTES.Completed.route}
+              element={<>Completed</>}
+            />
+            <Route path={CUSTOM_ROUTES.DueSoon.route} element={<>DueSoon</>} />{" "}
+            <Route
+              path={CUSTOM_ROUTES.HighPriority.route}
+              element={<>HighPriority</>}
+            />
+            <Route
+              path={CUSTOM_ROUTES.MediumPriority.route}
+              element={<>MediumPriority</>}
+            />
+            <Route
+              path={CUSTOM_ROUTES.LowPriority.route}
+              element={<>LowPriority</>}
+            />
+            <Route
+              path={CUSTOM_ROUTES.Notification.route}
+              element={<>Notification</>}
+            />
+            <Route path={CUSTOM_ROUTES.Users.route} element={<>Users</>} />
           </Route>
         </Routes>
       </div>

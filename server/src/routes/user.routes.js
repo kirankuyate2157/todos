@@ -2,7 +2,7 @@ import { Router } from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import { upload } from "../middlewares/multer.middleware.js";
-import { getCurrentUser, loginUser, logoutUser, registration, updateAccountDetails, updateUserAvatar } from '../controllers/user.controller.js';
+import { getAllUsers, getCurrentUser, getUserById, loginUser, logoutUser, registration, updateAccountDetails, updateUserAvatar } from '../controllers/user.controller.js';
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 
@@ -23,5 +23,6 @@ router.route("/logout").post(verifyJWT,logoutUser);
 router
   .route("/avatar")
   .patch(verifyJWT, upload.single("avatar"), updateUserAvatar);
-
+router.route("/id/:id").get(verifyJWT,getUserById);
+router.route("/search").get(verifyJWT,getAllUsers)
 export default router;

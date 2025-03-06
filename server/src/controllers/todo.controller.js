@@ -65,7 +65,7 @@ const getTodoById = asyncHandler(async (req, res) => {
 });
 
 const createTodo = asyncHandler(async (req, res) => {
-    const { title, description, tags, notes, mentionedUsers } = req.body;
+    const { title, description, tags, mentionedUsers } = req.body;
     if (!title) {
         throw new ApiError(400, "Title is required 🫠");
     }
@@ -74,7 +74,6 @@ const createTodo = asyncHandler(async (req, res) => {
         title,
         description,
         tags,
-        notes,
         mentionedUsers,
         user: req.user._id,
     });

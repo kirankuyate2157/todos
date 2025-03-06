@@ -198,6 +198,40 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, user, "Avatar image updated successfully ✅"));
 });
+
+const getAllUsers = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, search = "" } = req.query;
+    const query = {};
+
+    if (search.trim()) {
+        query.$or = [
+            { username: { $regex: search, $options: "i" } },
+            { fullName: { $regex: search, $options: "i" } }
+        ];
+    }
+
+    const users = await User.find(query)
+        .skip((page - 1) * limit)
+        .limit(parseInt(limit))
+        .select("-password -refreshToken");
+
+    const totalUsers = await User.countDocuments(query);
+
+    return res.status(200).json(new ApiResponse(200, { page, users, total_pages: totalUsers / limit }, "Users fetched successfully ✅"));
+});
+
+const getUserById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select("-password -refreshToken");
+
+    if (!user) {
+        throw new ApiError(404, "User not found 🫠");
+    }
+
+    return res.status(200).json(new ApiResponse(200, user, "User fetched successfully ✅"));
+});
+
 export {
-    registration, loginUser, logoutUser, getCurrentUser, updateAccountDetails, updateUserAvatar
+    registration, loginUser, logoutUser, getCurrentUser, updateAccountDetails, updateUserAvatar, getUserById, getAllUsers
 }
