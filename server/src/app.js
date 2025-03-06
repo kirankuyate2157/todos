@@ -8,12 +8,25 @@ app.use(express.json({ limit: "16kb" })); //json upload limit to save server fro
 app.use(express.urlencoded({ extended: true, limit: "16kb" })); //url data understanding
 app.use(cookieParser()); // for cookies set & clear & get 
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.CORS_ORIGIN,
+//     credentials: true,
+//   })
+// );
+app.use(function (req, res, next) {
+  // res.header("Access-Control-Allow-Origin", "*");
+  const allowedOrigins = process.env.CORS_ORIGIN;
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, UPDATE, PATCH");
+  next();
+});
+
 //routes
 //routes import
 import userRouter from "./routes/user.routes.js";
